@@ -5,11 +5,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  FormHelperText,
 } from '@mui/material';
 
-function BranchDropdown({ onSelect }) {
+function BranchDropdown({ onSelect, selected, error }) {
   const [branches, setBranches] = useState([]);
-  const [selected, setSelected] = useState('');
 
   useEffect(() => {
     const fetchBranches = async () => {
@@ -29,15 +29,19 @@ function BranchDropdown({ onSelect }) {
   }, []);
 
   const handleChange = (e) => {
-    const branchId = e.target.value;
-    setSelected(branchId);
-    onSelect(branchId);
+    onSelect(e.target.value);
   };
 
   return (
-    <FormControl fullWidth>
-      <InputLabel>Select Branch</InputLabel>
-      <Select value={selected} onChange={handleChange} label="Select Branch">
+    <FormControl fullWidth error={Boolean(error)}>
+      <InputLabel>
+        Select Branch <span style={{ color: 'red' }}>*</span>
+      </InputLabel>
+      <Select
+        value={selected}
+        onChange={handleChange}
+        label="Select Branch"
+      >
         <MenuItem value="">-- Select --</MenuItem>
         {branches.map(branch => (
           <MenuItem key={branch._id} value={branch._id}>
@@ -45,6 +49,7 @@ function BranchDropdown({ onSelect }) {
           </MenuItem>
         ))}
       </Select>
+      {error && <FormHelperText>{error}</FormHelperText>}
     </FormControl>
   );
 }

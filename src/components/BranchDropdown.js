@@ -8,7 +8,7 @@ import {
   FormHelperText,
 } from '@mui/material';
 
-function BranchDropdown({ onSelect, selected, error }) {
+function BranchDropdown({ onSelect, selected = '', error }) {
   const [branches, setBranches] = useState([]);
 
   useEffect(() => {
@@ -29,7 +29,9 @@ function BranchDropdown({ onSelect, selected, error }) {
   }, []);
 
   const handleChange = (e) => {
-    onSelect(e.target.value);
+    const branchId = e.target.value;
+    const branchName = branches.find(b => b._id === branchId)?.name || '';
+    onSelect({ id: branchId, name: branchName }); // send both
   };
 
   return (
@@ -38,7 +40,7 @@ function BranchDropdown({ onSelect, selected, error }) {
         Select Branch <span style={{ color: 'red' }}>*</span>
       </InputLabel>
       <Select
-        value={selected}
+        value={selected || ''} // controlled
         onChange={handleChange}
         label="Select Branch"
       >

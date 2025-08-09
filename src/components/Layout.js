@@ -3,42 +3,135 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Container,
-  Tabs,
-  Tab,
   Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  ListItemButton,
+  Button,
 } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import StarsIcon from '@mui/icons-material/Stars';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-const Layout = ({ children }) => {
+const drawerWidth = 240;
+
+const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isLoggedIn = Boolean(localStorage.getItem('authToken'));
 
-  const handleTabChange = (event, newValue) => {
-    navigate(newValue);
+  const menuItems = [
+    { text: 'Generate Report', icon: <AssessmentIcon />, path: '/' },
+    { text: 'High Value Upload', icon: <StarsIcon />, path: '/upload-high-value' },
+    { text: 'Priority Upload', icon: <PriorityHighIcon />, path: '/upload-priority' },
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/login');
   };
 
+  if (!isLoggedIn) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          backgroundColor: '#f5f5f5',
+          p: 2,
+        }}
+      >
+        {/* You can replace this with a redirect or a login prompt */}
+        <Typography variant="h6" color="text.secondary">
+          Please login to access the app.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <>
-      <AppBar position="static">
+    <Box sx={{ display: 'flex', height: '100vh' }}>
+      {/* App Bar */}
+      <AppBar
+        position="fixed"
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+      >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Branch Report Generator
           </Typography>
+          <Button color="inherit" startIcon={<LogoutIcon />} onClick={handleLogout}>
+            Logout
+          </Button>
         </Toolbar>
-        <Tabs
-          value={location.pathname}
-          onChange={handleTabChange}
-          indicatorColor="secondary"
-          textColor="inherit"
-          variant="scrollable"
-        >
-          <Tab label="Generate Report" value="/" />
-          {/* Future tabs like Report History can be added here */}
-        </Tabs>
       </AppBar>
-      <Container sx={{ mt: 4 }}>{children}</Container>
-    </>
+
+      {/* Sidebar Drawer */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ overflow: 'auto' }}>
+          <List>
+            {menuItems.map((item) => (
+              <ListItem disablePadding key={item.text}>
+                <ListItemButton
+                  selected={location.pathname === item.path}
+                  onClick={() => navigate(item.path)}
+                  sx={{
+                    '&.Mui-selected': {
+                      bgcolor: 'action.selected',
+                      color: 'primary.main',
+                      '& .MuiListItemIcon-root': {
+                        color: 'primary.main',
+                      },
+                    },
+                    '&.Mui-selected:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
+
+      {/* Main Content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          overflowY: 'auto',
+          backgroundColor: '#fafafa',
+        }}
+      >
+        <Toolbar />
+        {/* This renders the nested route component */}
+        <Outlet />
+      </Box>
+    </Box>
   );
 };
 

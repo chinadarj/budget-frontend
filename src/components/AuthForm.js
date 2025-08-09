@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import api from '../services/api';
+import api from '../services/api'; // make sure this points to your axios or fetch wrapper
 import {
   TextField,
   Button,
@@ -60,7 +60,10 @@ function AuthForm({ onAuthSuccess }) {
             fullWidth
           />
 
-          <Typography color={message.includes('successful') ? 'success.main' : 'error.main'}>
+          <Typography
+            color={message.includes('successful') ? 'success.main' : 'error.main'}
+            sx={{ minHeight: 24 }} // keep space even if no message
+          >
             {message}
           </Typography>
 

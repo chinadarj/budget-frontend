@@ -17,6 +17,8 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import StarsIcon from '@mui/icons-material/Stars';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { Navigate } from 'react-router-dom';
+
 
 const drawerWidth = 240;
 
@@ -37,24 +39,8 @@ const Layout = () => {
   };
 
   if (!isLoggedIn) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          backgroundColor: '#f5f5f5',
-          p: 2,
-        }}
-      >
-        {/* You can replace this with a redirect or a login prompt */}
-        <Typography variant="h6" color="text.secondary">
-          Please login to access the app.
-        </Typography>
-      </Box>
-    );
-  }
+  return <Navigate to="/login" replace />;
+}
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>

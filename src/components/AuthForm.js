@@ -6,6 +6,7 @@ import {
   Typography,
   Paper,
   Stack,
+  CircularProgress,
 } from '@mui/material';
 
 function AuthForm({ onAuthSuccess }) {
@@ -13,14 +14,20 @@ function AuthForm({ onAuthSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const toggleForm = () => {
-    setIsLogin(!isLogin);
-    setMessage('');
+    if (!loading) {
+      setIsLogin(!isLogin);
+      setMessage('');
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage('');
+
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
       const response = await api.post(endpoint, { username, password });
@@ -33,11 +40,13 @@ function AuthForm({ onAuthSuccess }) {
       setMessage(isLogin ? 'Login successful!' : 'Registration successful!');
     } catch (error) {
       setMessage(error.response?.data?.error || 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
+    <Paper elevation={3} sx={{ p: 4, maxWidth: 400, margin: 'auto' }}>
       <Typography variant="h6" gutterBottom>
         {isLogin ? 'Login' : 'Register'}
       </Typography>
@@ -50,6 +59,7 @@ function AuthForm({ onAuthSuccess }) {
             onChange={(e) => setUsername(e.target.value)}
             required
             fullWidth
+            disabled={loading}
           />
           <TextField
             label="Password"
@@ -58,17 +68,26 @@ function AuthForm({ onAuthSuccess }) {
             onChange={(e) => setPassword(e.target.value)}
             required
             fullWidth
+            disabled={loading}
           />
 
-          <Typography color={message.includes('successful') ? 'success.main' : 'error.main'}>
+          <Typography
+            color={message.includes('successful') ? 'success.main' : 'error.main'}
+            sx={{ minHeight: 24 }}
+          >
             {message}
           </Typography>
 
-          <Button variant="contained" type="submit">
-            {isLogin ? 'Login' : 'Register'}
+          <Button
+            variant="contained"
+            type="submit"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : null}
+          >
+            {loading ? 'Processing...' : isLogin ? 'Login' : 'Register'}
           </Button>
 
-          <Button variant="text" onClick={toggleForm}>
+          <Button variant="text" onClick={toggleForm} disabled={loading}>
             {isLogin ? 'Switch to Register' : 'Switch to Login'}
           </Button>
         </Stack>
